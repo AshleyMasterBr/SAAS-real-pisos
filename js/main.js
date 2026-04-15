@@ -10,7 +10,7 @@ function inicializarDadosEstruturais() {
     brandElements.forEach(el => {
         el.innerHTML = `${CONFIG.empresa.nome1} <span style="color: var(--primary);">${CONFIG.empresa.nome2}</span>`;
     });
-    
+
     // Altera nomes em títulos de feature
     const h2BrandElements = document.querySelectorAll('.dynamic-feature-brand');
     h2BrandElements.forEach(el => {
@@ -19,13 +19,14 @@ function inicializarDadosEstruturais() {
 
     // 1.2 Whatsapp Header Link
     const headerZapBtn = document.getElementById('headerZapBtn');
-    if(headerZapBtn) {
-        headerZapBtn.href = `https://wa.me/${CONFIG.empresa.whatsapp}`;
+    if (headerZapBtn) {
+        const textoHeader = "Olá! Fiz o orçamento manualmente na máquina de orçamento e tenho interesse no piso!";
+        headerZapBtn.href = `https://wa.me/${CONFIG.empresa.whatsapp}?text=${encodeURIComponent(textoHeader)}`;
     }
 
     // 1.3 Popular Options de Piso Atual
     const pisoAtualSelect = document.getElementById('pisoAtual');
-    if(pisoAtualSelect) {
+    if (pisoAtualSelect) {
         pisoAtualSelect.innerHTML = '';
         CONFIG.opcoesPisoAtual.forEach(op => {
             const tempOption = document.createElement('option');
@@ -37,16 +38,16 @@ function inicializarDadosEstruturais() {
 
     // 1.4 Popular Select de Modelos de Piso com Categorias
     const modeloSelect = document.getElementById('modelo');
-    if(modeloSelect) {
+    if (modeloSelect) {
         modeloSelect.innerHTML = '';
-        
+
         // Agrupar por categorias
         const categorias = [...new Set(CONFIG.pisos.map(item => item.categoria))];
-        
+
         categorias.forEach(cat => {
             const optgroup = document.createElement('optgroup');
             optgroup.label = cat;
-            
+
             // Pega pisos da categoria atual
             const pisosDaCategoria = CONFIG.pisos.filter(p => p.categoria === cat);
             pisosDaCategoria.forEach(piso => {
@@ -55,19 +56,19 @@ function inicializarDadosEstruturais() {
                 tempOption.innerText = `${piso.nome} - R$ ${piso.preco.toFixed(2).replace('.', ',')}/m²`;
                 optgroup.appendChild(tempOption);
             });
-            
+
             modeloSelect.appendChild(optgroup);
         });
     }
 
     // 1.5 Popular Lista de Bônus no Modal
     const bonusListContainer = document.getElementById('bonusListRenderer');
-    if(bonusListContainer) {
+    if (bonusListContainer) {
         bonusListContainer.innerHTML = '';
         CONFIG.bonus.forEach(bonus => {
             const div = document.createElement('div');
             div.className = `bonus-item ${bonus.gratis ? 'free' : ''}`;
-            
+
             let strikeHtml = bonus.strike ? `<span class="strike">${bonus.strike}</span> ` : '';
             div.innerHTML = `
                 <span><i class="fas fa-check"></i> ${bonus.titulo}</span>
@@ -79,7 +80,7 @@ function inicializarDadosEstruturais() {
 
     // 1.6 Disclaimer Dinâmico
     const disclaimerEl = document.getElementById('disclaimerText');
-    if(disclaimerEl && CONFIG.disclaimer) {
+    if (disclaimerEl && CONFIG.disclaimer) {
         disclaimerEl.innerText = CONFIG.disclaimer;
     }
 }
@@ -88,14 +89,14 @@ function inicializarDadosEstruturais() {
 function calcular() {
     const metragemInput = document.getElementById('metragem').value;
     const metragem = parseFloat(metragemInput.replace(',', '.'));
-    
+
     const modeloEl = document.getElementById('modelo');
     const modeloPreco = parseFloat(modeloEl.value);
     const modeloNome = modeloEl.options[modeloEl.selectedIndex].text;
 
     const pisoAtual = document.getElementById('pisoAtual');
     const pisoAtualNome = pisoAtual.options[pisoAtual.selectedIndex].text;
-    
+
     const nivelamentoEl = document.getElementById('nivelamento');
     const nivelamentoNome = nivelamentoEl.options[nivelamentoEl.selectedIndex].text;
 
@@ -107,7 +108,7 @@ function calcular() {
     // Lógica de Preço
     let total = metragem * modeloPreco;
     const valorFormatado = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    
+
     // Seta visualmente no modal
     document.getElementById('valorFinal').innerText = valorFormatado;
 
@@ -125,12 +126,12 @@ function calcular() {
 
     const link = `https://wa.me/${CONFIG.empresa.whatsapp}?text=${encodeURIComponent(textoZap)}`;
     document.getElementById('linkZap').href = link;
-    
+
     // Abre modal
     document.getElementById('modalResult').style.display = 'flex';
 
     // Dispara Evento pro Pixel (função no pixel.js)
-    if(typeof trackLead === 'function') {
+    if (typeof trackLead === 'function') {
         trackLead(total);
     }
 }
